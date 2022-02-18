@@ -5,7 +5,7 @@ let fs = require("fs");
 
 let http_server = http.createServer(function(req, res){
 
-	var archivo = "index.html";
+	let archivo = "index.html";
 	if (req.url != "/"){
 		archivo = req.url.substring(1);
 	}
