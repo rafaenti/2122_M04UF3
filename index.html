@@ -34,8 +34,10 @@ let cursors;
 let bg_img;
 let player_img;
 
-let player_speed = 0.5;
+let player_speed = 2;
 
+let player_x = 32;
+let player_y = 64;
 
 let car1_img;
 let car2_img;
@@ -52,8 +54,41 @@ let road2_y = 224;
 let road3_y = 380;
 let road4_y = 460;
 
+let road_offset_y = 96;
+
 let offset_x = -128;
 let scale_size = 3;
+
+let lives = 3;
+let score = 0;
+
+let lives_txt;
+let score_txt;
+
+let crossing = false;
+
+function reset ()
+{
+	crossing = false;
+
+	player_img.x = player_x;
+	player_img.y = player_y;
+
+	car1_img.x = game_w-offset_x;
+	car1_img.y = road1_y;
+
+	car2_img.x = game_w-offset_x
+	car2_img.y = road2_y;
+
+	car3_img.x = offset_x
+	car3_img.y = road3_y;
+
+	car4_img.x = offset_x
+	car4_img.y = road4_y;
+
+
+}
+
 
 function preload ()
 {
@@ -72,7 +107,7 @@ function create ()
 
 	bg_img = this.add.image(game_w/2,game_h/2, "background");
 
-	player_img = this.add.image(32, 64 , "woman");
+	player_img = this.add.image(player_x, player_y, "woman");
 	this.physics.add.existing(player_img, false);
 
 
@@ -95,6 +130,27 @@ function create ()
 	car3_img.setScale(scale_size);
 	car4_img.setScale(scale_size);
 
+
+	let cars = [car1_img, car2_img, car3_img, car4_img];
+
+	for (let i = 0; i < cars.length; i++){
+		this.physics.add.collider(player_img, cars[i], function (player, car){
+			reset();
+
+			lives--;
+			lives_txt.text = lives.toString();
+		});
+	}
+
+
+
+	this.add.text(game_w/2, 64, "VIDAS");
+	lives_txt = this.add.text(game_w/2+64, 64, "3");
+	
+
+	this.add.text(game_w/2+128, 64, "PUNTOS");
+	score_txt = this.add.text(game_w/2+196, 64, "0");
+
 }
 
 
@@ -114,8 +170,6 @@ function update ()
 		player_img.x += player_speed;		
 	}
 
-
-
 	car1_img.x -= car1_speed;
 	car2_img.x -= car2_speed;
 	car3_img.x += car3_speed;
@@ -125,6 +179,14 @@ function update ()
 	check_car(car2_img);
 	check_car(car3_img);
 	check_car(car4_img);
+
+	if (player_img.y > game_h - road_offset_y)
+		crossing = true;
+	else if (player_img.y <= road_offset_y && crossing){
+		crossing = false;
+		score++;
+		score_txt.text = score.toString();
+	}
 }
 
 function check_car (car)
